@@ -1,0 +1,49 @@
+name: Build and Deploy React app
+
+#on: [push, workflow_dispatch] test
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "version"
+        required: false
+        default: "reactapp"
+  push:
+    branches:
+      - 'main'
+env:
+  AZURE_REPO: reactapp
+
+jobs:
+  Build:
+    name: Build
+    runs-on: untu-latest
+    environment:
+      name: test
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+      - run: |
+          yarn config set registry https://registry.yarnpkg.com
+          yarn install --network-timeout=1000000
+          yarn build
+
+      - name: Docker Login to test
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.XAZURE_REGISTRY_HOSTX }}
+          username: ${{ secrets.XAZURE_REGISTRY_USERX }}
+          password: ${{ secrets.XAZURE_REGISTRY_PWX }}
+
+      - name: Build the Image to Container Registry
+        run: |
+          docker build -t ${{ secrets.XAZURE_REGISTRY_HOSTX }}/${{ env.AZURE_REPO }}:latest  .    
+  
+      - name: Push Image to Container Registry
+        run: | 
+          echo "pushing image to ACR"
+          docker push ${{ secrets.XAZURE_REGISTRY_HOSTX }}/${{ env.AZURE_REPO }}:latest
