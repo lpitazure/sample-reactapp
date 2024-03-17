@@ -41,9 +41,9 @@ jobs:
 
       - name: Build the Image to Container Registry
         run: |
-          docker build -t ${{ secrets.XAZURE_REGISTRY_HOSTX }}/${{ env.AZURE_REPO }}:latest  .    
+          docker build -t ${{ secrets.XAZURE_REGISTRY_HOSTX }}/${{ env.AZURE_REPO }}:v1  .    
   
       - name: Push Image to Container Registry
         run: | 
           echo "pushing image to ACR"
-          docker push ${{ secrets.XAZURE_REGISTRY_HOSTX }}/${{ env.AZURE_REPO }}:latest
+          docker push ${{ secrets.XAZURE_REGISTRY_HOSTX }}/${{ env.AZURE_REPO }}:v1
